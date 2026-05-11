@@ -325,28 +325,27 @@ const AiPaintSpecialist: React.FC<AiPaintProps> = ({ currentUser }) => {
 
       <style>{scrollbarStyles}</style>
 
-      {/* Mobile backdrop */}
+      {/* Mobile backdrop — menutup sidebar saat klik di luar */}
       {isSidebarOpen && (
         <div
-          className="md:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* ── Sidebar ── */}
       <aside className={`
-        fixed md:relative inset-y-0 left-0
-        z-50 md:z-auto
-        w-72 flex flex-col shrink-0
+        fixed inset-y-0 left-0 z-50
+        md:static md:z-auto
+        overflow-hidden shrink-0
         transition-all duration-300 ease-in-out
-        border-[#8b5a2b]/20
         ${theme === 'dark' ? 'bg-[#14110f]' : 'bg-[#f7f3f0]'}
         ${isSidebarOpen
-          ? 'translate-x-0 border-r md:w-72'
-          : '-translate-x-full md:translate-x-0 md:w-0 md:border-none md:overflow-hidden'
+          ? 'w-72 border-r border-[#8b5a2b]/20'
+          : 'w-0 md:w-0'
         }
       `}>
-        <div className="p-5 flex flex-col h-full min-w-70">
+        <div className="w-72 p-5 flex flex-col h-full">
           <div className="flex items-center gap-2 px-2 mb-10 text-[#8b5a2b]">
             <img className='w-12 h-12 rounded-full object-cover border border-[#8b5a2b]/30 shadow-lg' src={LogoCat} alt="logo" />
             <div className="flex items-center">
@@ -405,7 +404,7 @@ const AiPaintSpecialist: React.FC<AiPaintProps> = ({ currentUser }) => {
       </aside>
 
       {/* ── Main area ── */}
-      <main className={`flex-1 flex flex-col relative transition-colors duration-500 ${
+      <main className={`flex-1 flex flex-col overflow-hidden transition-colors duration-500 ${
         theme === 'dark' ? 'bg-[#1a1614]' : 'bg-[#fdfcfb]'
       }`}>
 
