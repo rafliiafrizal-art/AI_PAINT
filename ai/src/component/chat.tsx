@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import LogoCat from '../logo/LogoCat.png';
 import SettingsModal from './settingModals';
 
@@ -29,10 +29,32 @@ interface AiPaintProps {
   } | null;
 }
 
+const LoadingBubble = ({ theme }: { theme: 'dark' | 'light' }) => (
+  <div className="flex w-full justify-start animate-in slide-in-from-bottom-2">
+    <div className="flex gap-4 max-w-[85%] md:max-w-[80%]">
+      <div className="w-10 h-10 rounded-xl shrink-0 flex items-center justify-center shadow-xl bg-[#8b5a2b] text-white">
+        <Bot size={20} />
+      </div>
+      <div className="flex flex-col items-start">
+        <p className="font-black text-[9px] uppercase tracking-[0.2em] mb-1.5 text-[#8b5a2b]">R&D AI Agent</p>
+        <div className={`p-4 rounded-2xl shadow-xl border ${
+          theme === 'dark' ? 'bg-[#8b5a2b]/5 border-[#8b5a2b]/10' : 'bg-gray-100 border-gray-200'
+        }`}>
+          <div className="flex gap-1.5 items-center h-5">
+            {[0, 150, 300].map(delay => (
+              <span key={delay} className="w-2 h-2 rounded-full bg-[#8b5a2b]/60 animate-bounce" style={{ animationDelay: `${delay}ms` }} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 const AiPaintSpecialist: React.FC<AiPaintProps> = ({ currentUser }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 768);
   const [chatHistory, setChatHistory] = useState<ChatSession[]>([]);
   const [activeChatId, setActiveChatId] = useState<number | null>(null);
   const [expandedMessages, setExpandedMessages] = useState<Record<number, boolean>>({});
@@ -280,37 +302,7 @@ const AiPaintSpecialist: React.FC<AiPaintProps> = ({ currentUser }) => {
     setActiveChatId(null);
   };
 
-  const LoadingBubble = () => (
-    <div className="flex w-full justify-start animate-in slide-in-from-bottom-2">
-      <div className="flex gap-4 max-w-[85%] md:max-w-[80%]">
-        <div className="w-10 h-10 rounded-xl shrink-0 flex items-center justify-center shadow-xl bg-[#8b5a2b] text-white">
-          <Bot size={20} />
-        </div>
-        <div className="flex flex-col items-start">
-          <p className="font-black text-[9px] uppercase tracking-[0.2em] mb-1.5 text-[#8b5a2b]">
-            R&D AI Agent
-          </p>
-          <div className={`p-4 rounded-2xl shadow-xl border ${
-            theme === 'dark'
-              ? 'bg-[#8b5a2b]/5 border-[#8b5a2b]/10'
-              : 'bg-gray-100 border-gray-200'
-          }`}>
-            <div className="flex gap-1.5 items-center h-5">
-              {[0, 150, 300].map(delay => (
-                <span
-                  key={delay}
-                  className="w-2 h-2 rounded-full bg-[#8b5a2b]/60 animate-bounce"
-                  style={{ animationDelay: `${delay}ms` }}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const scrollbarStyles = theme === 'dark'
+  const scrollbarStyles = useMemo(() => theme === 'dark'
     ? `
       .custom-scrollbar::-webkit-scrollbar { width: 6px; }
       .custom-scrollbar::-webkit-scrollbar-track { background: #14110f; }
@@ -324,7 +316,7 @@ const AiPaintSpecialist: React.FC<AiPaintProps> = ({ currentUser }) => {
       .custom-scrollbar::-webkit-scrollbar-thumb { background: #8b5a2b55; border-radius: 999px; }
       .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #8b5a2b99; }
       * { scrollbar-width: thin; scrollbar-color: #8b5a2b55 #f7f3f0; }
-    `;
+    `, [theme]);
 
   return (
     <div className={`flex h-screen font-sans selection:bg-[#8b5a2b]/40 overflow-hidden text-sm transition-colors duration-500 ${
@@ -333,10 +325,27 @@ const AiPaintSpecialist: React.FC<AiPaintProps> = ({ currentUser }) => {
 
       <style>{scrollbarStyles}</style>
 
+      {/* Mobile backdrop */}
+      {isSidebarOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* ── Sidebar ── */}
-      <aside className={`relative transition-all duration-300 ease-in-out border-[#8b5a2b]/20 flex flex-col ${
-        theme === 'dark' ? 'bg-[#14110f]' : 'bg-[#f7f3f0]'
-      } ${isSidebarOpen ? 'w-72 border-r' : 'w-0 border-none overflow-hidden'}`}>
+      <aside className={`
+        fixed md:relative inset-y-0 left-0
+        z-50 md:z-auto
+        w-72 flex flex-col shrink-0
+        transition-all duration-300 ease-in-out
+        border-[#8b5a2b]/20
+        ${theme === 'dark' ? 'bg-[#14110f]' : 'bg-[#f7f3f0]'}
+        ${isSidebarOpen
+          ? 'translate-x-0 border-r md:w-72'
+          : '-translate-x-full md:translate-x-0 md:w-0 md:border-none md:overflow-hidden'
+        }
+      `}>
         <div className="p-5 flex flex-col h-full min-w-70">
           <div className="flex items-center gap-2 px-2 mb-10 text-[#8b5a2b]">
             <img className='w-12 h-12 rounded-full object-cover border border-[#8b5a2b]/30 shadow-lg' src={LogoCat} alt="logo" />
@@ -476,7 +485,7 @@ const AiPaintSpecialist: React.FC<AiPaintProps> = ({ currentUser }) => {
                             {copiedId === msg.id ? <Check size={16} className="text-green-500" /> : <Copy size={16} />}
                           </button>
                         </div>
-                        <div className={`relative p-4 rounded-2xl shadow-xl border leading-relaxed text-[15px] transition-all duration-500 whitespace-pre-wrap break-all md:wrap-break-word flex-1 ${
+                        <div className={`relative p-4 rounded-2xl shadow-xl border leading-relaxed text-[15px] transition-all duration-500 whitespace-pre-wrap wrap-break-word flex-1 ${
                           msg.role === 'assistant'
                             ? (theme === 'dark' ? 'bg-[#8b5a2b]/5 border-[#8b5a2b]/10 text-[#dcd7d4]' : 'bg-gray-100 border-gray-200 text-[#4a3a2e]')
                             : 'bg-[#8b5a2b] border-[#8b5a2b]/20 text-white'
@@ -499,7 +508,7 @@ const AiPaintSpecialist: React.FC<AiPaintProps> = ({ currentUser }) => {
                 </div>
               ))}
 
-              {isAiLoading && <LoadingBubble />}
+              {isAiLoading && <LoadingBubble theme={theme} />}
 
               <div ref={chatEndRef} className="h-32" />
             </div>

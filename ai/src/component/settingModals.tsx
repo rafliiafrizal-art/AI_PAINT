@@ -126,27 +126,27 @@ const handleBlockchainSync = async () => {
 
   return (
     <div className="fixed inset-0 z-110 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300 text-sm">
-      <div className={`border border-[#8b5a2b]/30 rounded-4xl w-full max-w-4xl h-150 flex overflow-hidden shadow-2xl transition-all duration-500 ${
+      <div className={`border border-[#8b5a2b]/30 rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col md:flex-row overflow-hidden shadow-2xl transition-all duration-500 ${
         theme === 'dark' ? 'bg-[#1e1a17] text-[#dcd7d4]' : 'bg-[#fdfcfb] text-[#4a3a2e]'
       }`}>
-        
-        {/* ── Sidebar Modal (tidak diubah) ── */}
-        <div className={`w-64 border-r border-[#8b5a2b]/10 p-6 flex flex-col transition-colors ${
+
+        {/* ── Sidebar Modal ── */}
+        <div className={`md:w-64 border-b md:border-b-0 md:border-r border-[#8b5a2b]/10 p-4 md:p-6 flex flex-col shrink-0 transition-colors ${
           theme === 'dark' ? 'bg-[#14110f]' : 'bg-[#f7f3f0]'
         }`}>
-          <h2 className="text-xl font-bold mb-8 px-2 text-[#8b5a2b]">Setelan</h2>
-          <nav className="space-y-2">
+          <h2 className="text-lg md:text-xl font-bold mb-4 md:mb-8 px-2 text-[#8b5a2b]">Setelan</h2>
+          <nav className="flex md:flex-col gap-1 overflow-x-auto md:overflow-x-visible pb-1 md:pb-0">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-3 w-full p-3 rounded-xl text-sm font-medium transition-all ${
+                className={`flex items-center gap-2 shrink-0 md:w-full p-2.5 md:p-3 rounded-xl text-xs md:text-sm font-medium transition-all ${
                   activeTab === tab.id
                     ? 'bg-[#8b5a2b] text-white shadow-lg'
                     : 'text-gray-500 hover:bg-[#8b5a2b]/10'
                 }`}
               >
-                <tab.icon size={18} /> {tab.label}
+                <tab.icon size={16} /> {tab.label}
               </button>
             ))}
           </nav>
